@@ -19,7 +19,6 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class AppUser implements UserDetails {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;

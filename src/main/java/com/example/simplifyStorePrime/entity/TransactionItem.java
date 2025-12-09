@@ -11,7 +11,6 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class TransactionItem {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -28,7 +27,7 @@ public class TransactionItem {
 
     @Column(nullable = false)
     private Integer quantity;
-    
+
     @Column(name = "price_per_unit", nullable = false)
     private Double pricePerUnit;
 }
