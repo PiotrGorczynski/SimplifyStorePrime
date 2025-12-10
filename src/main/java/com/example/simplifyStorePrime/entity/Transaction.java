@@ -3,7 +3,7 @@ package com.example.simplifyStorePrime.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +19,7 @@ public class Transaction {
     private Integer id;
 
     @Column(nullable = false)
-    private LocalDate date;
+    private LocalDateTime transactionDate;
 
     @Column(nullable = false, length = 50)
     private String type;
@@ -44,7 +44,7 @@ public class Transaction {
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
-    @OneToMany(mappedBy = "transaction", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "transaction", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @Builder.Default
     @ToString.Exclude
     private List<TransactionItem> items = new ArrayList<>();
