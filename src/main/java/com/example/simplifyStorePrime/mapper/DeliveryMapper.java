@@ -17,5 +17,7 @@ public interface DeliveryMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "transaction", source = "tr")
+    @Mapping(target = "status", source = "dto.status")
+    @Mapping(target = "provider", source = "dto.provider")
     void updateEntity(@MappingTarget Delivery delivery, DeliveryDTO dto, Transaction tr);
 }

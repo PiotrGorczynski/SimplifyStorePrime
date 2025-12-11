@@ -9,6 +9,7 @@ import org.mapstruct.Mapping;
 public interface AppUserMapper {
     AppUserDTO toDTO(AppUser user);
 
-    @Mapping(target = "authorities", ignore = true)
+    @Mapping(target = "role", ignore = true)
+    @Mapping(target = "password", ignore = true)
     AppUser toEntity(AppUserDTO dto);
 }

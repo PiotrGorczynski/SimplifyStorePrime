@@ -10,10 +10,12 @@ public interface TransactionMapper {
     @Mapping(source = "customer.id", target = "customerId")
     @Mapping(source = "customer.info", target = "customerInfo")
     @Mapping(source = "employee.username", target = "employeeName")
+    @Mapping(source = "transactionDate", target = "date")
     TransactionDTO toDTO(Transaction transaction);
 
     @Mapping(target = "customer", ignore = true)
     @Mapping(target = "employee", ignore = true)
     @Mapping(target = "items", ignore = true)
+    @Mapping(source = "date", target = "transactionDate")
     Transaction toEntity(TransactionDTO dto);
 }
