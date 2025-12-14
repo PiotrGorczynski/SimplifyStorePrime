@@ -85,4 +85,28 @@ public class TransactionService {
                 .map(transactionMapper::toDTO)
                 .toList();
     }
+
+    @Transactional
+    public TransactionDTO update(Integer id, TransactionDTO dto) {
+        Transaction existing = transactionRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(ErrorMessages.TRANSACTION_NOT_FOUND));
+
+        //TODO draft
+        transactionMapper.updateEntity(dto, existing);
+
+        if (dto.getCustomerId() != null) {
+            Customer customer = customerRepository.findById(dto.getCustomerId())
+                    .orElseThrow(() -> new EntityNotFoundException(ErrorMessages.CUSTOMER_NOT_FOUND));
+            existing.setCustomer(customer);
+        }
+
+        return transactionMapper.toDTO(transactionRepository.save(existing));
+    }
+
+    public void delete(Integer id) {
+        if (!transactionRepository.existsById(id)) {
+            throw new EntityNotFoundException(ErrorMessages.TRANSACTION_NOT_FOUND);
+        }
+        transactionRepository.deleteById(id);
+    }
 }
