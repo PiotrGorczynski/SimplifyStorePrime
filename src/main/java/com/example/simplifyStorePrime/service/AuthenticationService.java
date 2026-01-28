@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -23,17 +24,26 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
+    @Transactional
     public AuthenticationResponse register(RegisterRequest request) {
-        AppUser user = new AppUser();
-        user.setUsername(request.getUsername());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole(request.getRole() != null ? request.getRole() : "USER");
+        if (repository.existsByUsername(request.getUsername())) {
+            throw new RuntimeException("Username already exists: " + request.getUsername());
+        }
 
-        repository.save(user);
+        AppUser user = AppUser.builder()
+                .username(request.getUsername())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .role(request.getRole() != null ? request.getRole() : "USER")
+                .enabled(true)
+                .build();
 
-        UserDetails userDetails = User.withUsername(user.getUsername())
-                .password(user.getPassword())
-                .roles(user.getRole())
+        AppUser saved = repository.save(user);
+
+        System.out.println("=== USER SAVED: " + saved.getId() + " - " + saved.getUsername() + " ===");
+
+        UserDetails userDetails = User.withUsername(saved.getUsername())
+                .password(saved.getPassword())
+                .roles(saved.getRole())
                 .build();
 
         String jwtToken = jwtService.generateToken(userDetails);

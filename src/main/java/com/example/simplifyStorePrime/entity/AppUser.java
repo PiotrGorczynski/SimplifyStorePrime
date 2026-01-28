@@ -29,6 +29,9 @@ public class AppUser implements UserDetails {
     @Column(nullable = false, length = 255)
     private String password;
 
+    @Column(unique = true)
+    private String email;
+
     @Column(nullable = false, length = 20)
     private String role;
 

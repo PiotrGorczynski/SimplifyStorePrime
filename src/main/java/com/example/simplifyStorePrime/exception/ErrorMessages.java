@@ -11,6 +11,8 @@ public final class ErrorMessages {
     public static final String DELIVERY_NOT_FOUND = "Delivery not found";
     public static final String DELIVERY_ALREADY_EXISTS = "Delivery already exists";
     public static final String NOT_ENOUGH_STOCK = "Not enough stock for product: ";
-    public static final String SALE = "SALE";
-    public static final String RETURN = "RETURN";
+    public static final String SALE = "sale";
+    public static final String RETURN = "return";
+    public static final String EXCHANGE = "exchange";
+    public static final String REFUND = "refund";
 }

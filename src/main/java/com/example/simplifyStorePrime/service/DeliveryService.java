@@ -36,7 +36,6 @@ public class DeliveryService {
         Transaction transaction = transactionRepository.findById(dto.getTransactionId())
                 .orElseThrow(() -> new EntityNotFoundException(ErrorMessages.TRANSACTION_NOT_FOUND));
 
-        //check if exists
         if (deliveryRepository.findByTransactionId(dto.getTransactionId()).isPresent()) {
             throw new IllegalStateException(ErrorMessages.DELIVERY_ALREADY_EXISTS);
         }

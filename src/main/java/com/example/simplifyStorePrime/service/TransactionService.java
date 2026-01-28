@@ -2,17 +2,13 @@ package com.example.simplifyStorePrime.service;
 
 import com.example.simplifyStorePrime.dto.TransactionDTO;
 import com.example.simplifyStorePrime.dto.TransactionItemDTO;
-import com.example.simplifyStorePrime.entity.Customer;
-import com.example.simplifyStorePrime.entity.Product;
-import com.example.simplifyStorePrime.entity.Transaction;
-import com.example.simplifyStorePrime.entity.TransactionItem;
+import com.example.simplifyStorePrime.entity.*;
 import com.example.simplifyStorePrime.mapper.TransactionMapper;
-import com.example.simplifyStorePrime.repository.CustomerRepository;
-import com.example.simplifyStorePrime.repository.ProductRepository;
-import com.example.simplifyStorePrime.repository.TransactionItemRepository;
-import com.example.simplifyStorePrime.repository.TransactionRepository;
+import com.example.simplifyStorePrime.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,7 +25,9 @@ public class TransactionService {
     private final TransactionItemRepository transactionItemRepository;
     private final CustomerRepository customerRepository;
     private final ProductRepository productRepository;
+    private final DeliveryRepository deliveryRepository;
     private final TransactionMapper transactionMapper;
+    private final AppUserRepository appUserRepository;
 
     @Transactional
     public TransactionDTO createTransaction(TransactionDTO dto) {
@@ -38,6 +36,11 @@ public class TransactionService {
 
         Transaction transaction = transactionMapper.toEntity(dto);
         transaction.setCustomer(customer);
+        String username = getCurrentUsername();
+        if (username != null) {
+            appUserRepository.findByUsername(username)
+                    .ifPresent(transaction::setEmployee);
+        }
         transaction.setTransactionDate(LocalDateTime.now());
 
         Transaction savedTransaction = transactionRepository.save(transaction);
@@ -64,19 +67,45 @@ public class TransactionService {
             savedTransaction.setItems(new ArrayList<>(items));
         }
 
+        if (requiresDelivery(dto.getType())) {
+            createDeliveryForTransaction(savedTransaction, dto.getProvider());
+        }
+
         return transactionMapper.toDTO(savedTransaction);
+    }
+
+    private String getCurrentUsername() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof UserDetails) {
+            return ((UserDetails) principal).getUsername();
+        }
+        return principal.toString();
+    }
+
+    private boolean requiresDelivery(String type) {
+        return SALE.equalsIgnoreCase(type) || EXCHANGE.equalsIgnoreCase(type);
+    }
+
+    private void createDeliveryForTransaction(Transaction transaction, String provider) {
+        Delivery delivery = new Delivery();
+        delivery.setTransaction(transaction);
+        delivery.setDeliveryType("standard");
+        delivery.setStatus("pending");
+        delivery.setProvider(provider != null ? provider : "Default Provider");
+
+        deliveryRepository.save(delivery);
     }
 
     @Transactional(readOnly = true)
     public List<TransactionDTO> getAllTransactions() {
-        return transactionRepository.findAll().stream()
+        return transactionRepository.findAllWithDetails().stream()
                 .map(transactionMapper::toDTO)
                 .toList();
     }
 
     @Transactional(readOnly = true)
     public TransactionDTO getTransactionById(Integer id) {
-        return transactionRepository.findById(id)
+        return transactionRepository.findByIdWithDetails(id)
                 .map(transactionMapper::toDTO)
                 .orElseThrow(() -> new EntityNotFoundException(TRANSACTION_NOT_FOUND));
     }
@@ -93,12 +122,20 @@ public class TransactionService {
 
     @Transactional
     public TransactionDTO update(Integer id, TransactionDTO dto) {
-        Transaction existing = transactionRepository.findById(id)
+        Transaction existing = transactionRepository.findByIdWithDetails(id)
                 .orElseThrow(() -> new EntityNotFoundException(TRANSACTION_NOT_FOUND));
 
         String oldType = existing.getType();
+        String newType = dto.getType() != null ? dto.getType() : oldType;
+        boolean typeChanged = !oldType.equalsIgnoreCase(newType);
 
         transactionMapper.updateEntity(dto, existing);
+
+        String username = getCurrentUsername();
+        if (username != null) {
+            appUserRepository.findByUsername(username)
+                    .ifPresent(existing::setEmployee);
+        }
 
         if (dto.getCustomerId() != null) {
             Customer customer = customerRepository.findById(dto.getCustomerId())
@@ -117,7 +154,6 @@ public class TransactionService {
                     transactionItemRepository.findByTransactionId(id)
             );
 
-            String newType = dto.getType() != null ? dto.getType() : oldType;
             for (TransactionItemDTO itemDto : dto.getItems()) {
                 Product product = productRepository.findById(itemDto.getProductId())
                         .orElseThrow(() -> new EntityNotFoundException(PRODUCT_NOT_FOUND));
@@ -134,21 +170,48 @@ public class TransactionService {
 
                 existing.getItems().add(item);
             }
+        } else if (typeChanged) {
+            for (TransactionItem item : existing.getItems()) {
+                Product product = item.getProduct();
+                updateStock(product, item.getQuantity(), oldType, true);
+                updateStock(product, item.getQuantity(), newType, false);
+            }
+        }
+
+        if (typeChanged) {
+            handleDeliveryOnTypeChange(existing, oldType, newType, dto.getProvider());
         }
 
         Transaction saved = transactionRepository.save(existing);
         return transactionMapper.toDTO(saved);
     }
 
+    private void handleDeliveryOnTypeChange(Transaction transaction, String oldType, String newType, String provider) {
+        boolean hadDelivery = requiresDelivery(oldType);
+        boolean needsDelivery = requiresDelivery(newType);
+
+        if (hadDelivery && !needsDelivery) {
+            deliveryRepository.deleteByTransactionId(transaction.getId());
+        } else if (!hadDelivery && needsDelivery) {
+            if (!deliveryRepository.existsByTransactionId(transaction.getId())) {
+                createDeliveryForTransaction(transaction, provider);
+            }
+        }
+    }
+
     @Transactional
     public void delete(Integer id) {
-        Transaction transaction = transactionRepository.findById(id)
+        Transaction transaction = transactionRepository.findByIdWithDetails(id)
                 .orElseThrow(() -> new EntityNotFoundException(TRANSACTION_NOT_FOUND));
 
-        for (TransactionItem item : transaction.getItems()) {
-            Product product = item.getProduct();
-            updateStock(product, item.getQuantity(), transaction.getType(), true);
+        if (transaction.getItems() != null) {
+            for (TransactionItem item : transaction.getItems()) {
+                Product product = item.getProduct();
+                updateStock(product, item.getQuantity(), transaction.getType(), true);
+            }
         }
+
+        deliveryRepository.deleteByTransactionId(id);
 
         transactionRepository.deleteById(id);
     }
@@ -159,6 +222,12 @@ public class TransactionService {
 
         boolean isSale = SALE.equalsIgnoreCase(type);
         boolean isReturn = RETURN.equalsIgnoreCase(type);
+        boolean isExchange = EXCHANGE.equalsIgnoreCase(type);
+        boolean isRefund = REFUND.equalsIgnoreCase(type);
+
+        if (isExchange || isRefund) {
+            return;
+        }
 
         if (revert) {
             if (isSale) {

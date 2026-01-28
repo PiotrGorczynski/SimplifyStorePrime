@@ -41,7 +41,6 @@ public class TransactionController {
         return ResponseEntity.ok(transactionService.update(id, dto));
     }
 
-    // DELETE: Usuwanie transakcji (ostrożnie z tym w prawdziwym życiu!)
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTransaction(@PathVariable Integer id) {
         transactionService.delete(id);

@@ -14,7 +14,7 @@ public class Delivery {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(nullable = false)
+    @Column(name = "delivery_type", nullable = false)
     private String deliveryType;
 
     @Column(nullable = false)
@@ -23,8 +23,7 @@ public class Delivery {
     @Column(nullable = false)
     private String provider;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "transaction_id", nullable = false)
-    @ToString.Exclude
     private Transaction transaction;
 }
