@@ -40,7 +40,7 @@ public class EmailService {
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
                 <div style="text-align: center; margin-bottom: 30px;">
                     <h1 style="color: #1a1a2e; margin: 0;">SIMPLIFY</h1>
-                    <p style="color: #e74c3c; font-weight: bold; letter-spacing: 2px; margin: 5px 0;">STORE PRIME</p>
+                    <p style="color: #3B82F6; font-weight: bold; letter-spacing: 2px; margin: 5px 0;">STORE PRIME</p>
                 </div>
             
                 <h2 style="color: #333;">Password Reset Request</h2>
