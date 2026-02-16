@@ -5,6 +5,7 @@ import com.example.simplifyStorePrime.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import java.util.Random;
 @Component
 @Profile("seed")
 @RequiredArgsConstructor
+@Order(0)
 public class CustomerSeeder implements CommandLineRunner {
 
     private final CustomerRepository customerRepository;
