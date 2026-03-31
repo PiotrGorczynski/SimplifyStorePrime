@@ -6,8 +6,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.repository.query.Param;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,7 +27,4 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
     Optional<Transaction> findByIdWithDetails(@Param("id") Integer id);
 
     List<Transaction> findByCustomerId(Integer customerId);
-    List<Transaction> findByTransactionDate(LocalDateTime transactionDate);
-    List<Transaction> findByTransactionDateBetween(LocalDate startDate, LocalDate endDate);
-    List<Transaction> findByStatus(String status);
 }
