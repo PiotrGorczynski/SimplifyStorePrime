@@ -30,6 +30,7 @@ public class AnalyticsService {
                 .totalDeliveries(deliveryRepository.count())
                 .paymentMethodsDistribution(getPaymentMethodsDistribution())
                 .transactionStatusDistribution(getTransactionStatusDistribution())
+                .deliveryTypeDistribution(getDeliveryTypeDistribution())
                 .topProducts(getTopProductsByRevenue())
                 .dailyTransactions(getDailyTransactions())
                 .build();
@@ -79,6 +80,15 @@ public class AnalyticsService {
                         .revenue(e.getValue())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    private Map<String, Long> getDeliveryTypeDistribution() {
+        return deliveryRepository.findAll().stream()
+                .filter(d -> d.getDeliveryType() != null)
+                .collect(Collectors.groupingBy(
+                        d -> d.getDeliveryType(),
+                        Collectors.counting()
+                ));
     }
 
     private List<AnalyticsDTO.DailyTransactionDTO> getDailyTransactions() {

@@ -26,6 +26,8 @@ public class AnalyticsDTO {
 
     private List<DailyTransactionDTO> dailyTransactions;
 
+    private Map<String, Long> deliveryTypeDistribution;
+
     @Data
     @Builder
     @NoArgsConstructor
