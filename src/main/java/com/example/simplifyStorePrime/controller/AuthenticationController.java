@@ -6,6 +6,7 @@ import com.example.simplifyStorePrime.dto.RegisterRequest;
 import com.example.simplifyStorePrime.service.AuthenticationService;
 import com.example.simplifyStorePrime.service.RateLimiterService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,7 @@ public class AuthenticationController {
     private final RateLimiterService rateLimiterService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest request, HttpServletRequest httpRequest) {
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request, HttpServletRequest httpRequest) {
         if (!rateLimiterService.resolveRegisterBucket(getClientIP(httpRequest)).tryConsume(1)) {
             return tooManyRequests(AppConstants.TOO_MANY_REGISTRATIONS);
         }
@@ -33,7 +34,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/authenticate")
-    public ResponseEntity<?> authenticate(@RequestBody AuthenticationRequest request, HttpServletRequest httpRequest) {
+    public ResponseEntity<?> authenticate(@Valid @RequestBody AuthenticationRequest request, HttpServletRequest httpRequest) {
         if (!rateLimiterService.resolveLoginBucket(getClientIP(httpRequest)).tryConsume(1)) {
             return tooManyRequests(AppConstants.TOO_MANY_LOGINS);
         }

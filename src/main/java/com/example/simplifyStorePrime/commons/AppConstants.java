@@ -26,6 +26,7 @@ public final class AppConstants {
     public static final String ERROR_NOT_FOUND = "Not Found";
     public static final String ERROR_CONFLICT = "Conflict";
     public static final String ERROR_INTERNAL = "Internal Server Error";
+    public static final String ERROR_VALIDATION = "Validation Failed";
 
     // ==================== RATE LIMITING MESSAGES ====================
     public static final String TOO_MANY_REGISTRATIONS = "Too many registration attempts. Please try again later.";
@@ -110,6 +111,7 @@ public final class AppConstants {
     public static final String RESPONSE_TIMESTAMP = "timestamp";
     public static final String RESPONSE_STATUS = "status";
     public static final String RESPONSE_ERROR = "error";
+    public static final String RESPONSE_MESSAGES = "messages";
 
     // ==================== DATABASE ====================
     public static final String COLUMN_TEXT = "TEXT";

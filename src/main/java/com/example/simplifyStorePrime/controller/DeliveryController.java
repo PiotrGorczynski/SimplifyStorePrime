@@ -2,6 +2,7 @@ package com.example.simplifyStorePrime.controller;
 
 import com.example.simplifyStorePrime.dto.DeliveryDTO;
 import com.example.simplifyStorePrime.service.DeliveryService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,16 +27,17 @@ public class DeliveryController {
     }
 
     @PostMapping
-    public ResponseEntity<DeliveryDTO> createDelivery(@RequestBody DeliveryDTO dto) {
+    public ResponseEntity<DeliveryDTO> createDelivery(@Valid @RequestBody DeliveryDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(deliveryService.createDelivery(dto));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<DeliveryDTO> updateDelivery(@PathVariable Integer id, @RequestBody DeliveryDTO dto) {
+    public ResponseEntity<DeliveryDTO> updateDelivery(@PathVariable Integer id,
+                                                      @Valid @RequestBody DeliveryDTO dto) {
         return ResponseEntity.ok(deliveryService.updateDelivery(id, dto));
     }
-    
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteDelivery(@PathVariable Integer id) {
         deliveryService.deleteDelivery(id);

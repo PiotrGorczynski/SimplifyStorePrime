@@ -2,6 +2,7 @@ package com.example.simplifyStorePrime.controller;
 
 import com.example.simplifyStorePrime.dto.ProductDTO;
 import com.example.simplifyStorePrime.service.ProductService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,13 +27,14 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<ProductDTO> createProduct(@RequestBody ProductDTO dto) {
+    public ResponseEntity<ProductDTO> createProduct(@Valid @RequestBody ProductDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(productService.createProduct(dto));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProductDTO> updateProduct(@PathVariable Integer id, @RequestBody ProductDTO dto) {
+    public ResponseEntity<ProductDTO> updateProduct(@PathVariable Integer id,
+                                                    @Valid @RequestBody ProductDTO dto) {
         return ResponseEntity.ok(productService.updateProduct(id, dto));
     }
 

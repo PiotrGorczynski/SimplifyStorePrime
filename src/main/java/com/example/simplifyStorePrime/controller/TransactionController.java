@@ -2,6 +2,7 @@ package com.example.simplifyStorePrime.controller;
 
 import com.example.simplifyStorePrime.dto.TransactionDTO;
 import com.example.simplifyStorePrime.service.TransactionService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,13 +32,14 @@ public class TransactionController {
     }
 
     @PostMapping
-    public ResponseEntity<TransactionDTO> createTransaction(@RequestBody TransactionDTO dto) {
+    public ResponseEntity<TransactionDTO> createTransaction(@Valid @RequestBody TransactionDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(transactionService.createTransaction(dto));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TransactionDTO> updateTransaction(@PathVariable Integer id, @RequestBody TransactionDTO dto) {
+    public ResponseEntity<TransactionDTO> updateTransaction(@PathVariable Integer id,
+                                                            @Valid @RequestBody TransactionDTO dto) {
         return ResponseEntity.ok(transactionService.update(id, dto));
     }
 
