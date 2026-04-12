@@ -1,5 +1,6 @@
 package com.example.simplifyStorePrime.entity;
 
+import com.example.simplifyStorePrime.commons.AppConstants;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,15 +33,15 @@ public class Product {
     @Column(nullable = false)
     private Integer stock;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = AppConstants.COLUMN_TEXT)
     private String description;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = AppConstants.COLUMN_TEXT)
     private String notes;
 
     @Column(nullable = false)
     private Integer minQuantity;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = AppConstants.COLUMN_TEXT)
     private String another;
 }

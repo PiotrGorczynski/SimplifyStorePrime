@@ -1,5 +1,6 @@
 package com.example.simplifyStorePrime.exception;
 
+import com.example.simplifyStorePrime.commons.AppConstants;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,30 +17,30 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleEntityNotFound(EntityNotFoundException ex) {
         Map<String, Object> errorResponse = new HashMap<>();
-        errorResponse.put("timestamp", LocalDateTime.now());
-        errorResponse.put("status", HttpStatus.NOT_FOUND.value());
-        errorResponse.put("error", "Not Found");
-        errorResponse.put("message", ex.getMessage());
+        errorResponse.put(AppConstants.RESPONSE_TIMESTAMP, LocalDateTime.now());
+        errorResponse.put(AppConstants.RESPONSE_STATUS, HttpStatus.NOT_FOUND.value());
+        errorResponse.put(AppConstants.RESPONSE_ERROR, AppConstants.ERROR_NOT_FOUND);
+        errorResponse.put(AppConstants.RESPONSE_MESSAGE, ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<Map<String, Object>> handleIllegalState(IllegalStateException ex) {
         Map<String, Object> errorResponse = new HashMap<>();
-        errorResponse.put("timestamp", LocalDateTime.now());
-        errorResponse.put("status", HttpStatus.CONFLICT.value());
-        errorResponse.put("error", "Conflict");
-        errorResponse.put("message", ex.getMessage());
+        errorResponse.put(AppConstants.RESPONSE_TIMESTAMP, LocalDateTime.now());
+        errorResponse.put(AppConstants.RESPONSE_STATUS, HttpStatus.CONFLICT.value());
+        errorResponse.put(AppConstants.RESPONSE_ERROR, AppConstants.ERROR_CONFLICT);
+        errorResponse.put(AppConstants.RESPONSE_MESSAGE, ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGeneralException(Exception ex) {
         Map<String, Object> errorResponse = new HashMap<>();
-        errorResponse.put("timestamp", LocalDateTime.now());
-        errorResponse.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
-        errorResponse.put("error", "Internal Server Error");
-        errorResponse.put("message", ex.getMessage());
+        errorResponse.put(AppConstants.RESPONSE_TIMESTAMP, LocalDateTime.now());
+        errorResponse.put(AppConstants.RESPONSE_STATUS, HttpStatus.INTERNAL_SERVER_ERROR.value());
+        errorResponse.put(AppConstants.RESPONSE_ERROR, AppConstants.ERROR_INTERNAL);
+        errorResponse.put(AppConstants.RESPONSE_MESSAGE, ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

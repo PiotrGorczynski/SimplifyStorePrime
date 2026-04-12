@@ -1,5 +1,6 @@
 package com.example.simplifyStorePrime.security;
 
+import com.example.simplifyStorePrime.commons.AppConstants;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -35,10 +36,10 @@ public class JwtService {
 
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> extraClaims = new HashMap<>();
-        extraClaims.put("role", userDetails.getAuthorities().stream()
+        extraClaims.put(AppConstants.CLAIM_ROLE, userDetails.getAuthorities().stream()
                 .findFirst()
                 .map(GrantedAuthority::getAuthority)
-                .orElse("ROLE_USER"));
+                .orElse(AppConstants.ROLE_USER_DEFAULT));
         return generateToken(extraClaims, userDetails);
     }
 

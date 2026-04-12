@@ -1,5 +1,6 @@
 package com.example.simplifyStorePrime.config;
 
+import com.example.simplifyStorePrime.commons.AppConstants;
 import com.example.simplifyStorePrime.security.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -30,11 +31,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
 
-        final String authHeader = request.getHeader("Authorization");
+        final String authHeader = request.getHeader(AppConstants.AUTHORIZATION_HEADER);
         final String jwt;
         final String username;
 
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        if (authHeader == null || !authHeader.startsWith(AppConstants.BEARER_PREFIX)) {
             filterChain.doFilter(request, response);
             return;
         }

@@ -1,5 +1,6 @@
 package com.example.simplifyStorePrime.service;
 
+import com.example.simplifyStorePrime.commons.AppConstants;
 import com.example.simplifyStorePrime.dto.TransactionDTO;
 import com.example.simplifyStorePrime.dto.TransactionItemDTO;
 import com.example.simplifyStorePrime.entity.*;
@@ -16,8 +17,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.example.simplifyStorePrime.exception.ErrorMessages.*;
-
 @Service
 @RequiredArgsConstructor
 public class TransactionService {
@@ -32,7 +31,7 @@ public class TransactionService {
     @Transactional
     public TransactionDTO createTransaction(TransactionDTO dto) {
         Customer customer = customerRepository.findById(dto.getCustomerId())
-                .orElseThrow(() -> new EntityNotFoundException(CUSTOMER_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException(AppConstants.CUSTOMER_NOT_FOUND));
 
         Transaction transaction = transactionMapper.toEntity(dto);
         transaction.setCustomer(customer);
@@ -50,7 +49,7 @@ public class TransactionService {
 
             for (TransactionItemDTO itemDto : dto.getItems()) {
                 Product product = productRepository.findById(itemDto.getProductId())
-                        .orElseThrow(() -> new EntityNotFoundException(PRODUCT_NOT_FOUND));
+                        .orElseThrow(() -> new EntityNotFoundException(AppConstants.PRODUCT_NOT_FOUND));
 
                 updateStock(product, itemDto.getQuantity(), dto.getType(), false);
 
@@ -83,15 +82,15 @@ public class TransactionService {
     }
 
     private boolean requiresDelivery(String type) {
-        return SALE.equalsIgnoreCase(type) || EXCHANGE.equalsIgnoreCase(type);
+        return AppConstants.SALE.equalsIgnoreCase(type) || AppConstants.EXCHANGE.equalsIgnoreCase(type);
     }
 
     private void createDeliveryForTransaction(Transaction transaction, String provider) {
         Delivery delivery = new Delivery();
         delivery.setTransaction(transaction);
-        delivery.setDeliveryType("standard");
-        delivery.setStatus("pending");
-        delivery.setProvider(provider != null ? provider : "Default Provider");
+        delivery.setDeliveryType(AppConstants.DEFAULT_DELIVERY_TYPE);
+        delivery.setStatus(AppConstants.DEFAULT_DELIVERY_STATUS);
+        delivery.setProvider(provider != null ? provider : AppConstants.DEFAULT_PROVIDER);
 
         deliveryRepository.save(delivery);
     }
@@ -107,13 +106,13 @@ public class TransactionService {
     public TransactionDTO getTransactionById(Integer id) {
         return transactionRepository.findByIdWithDetails(id)
                 .map(transactionMapper::toDTO)
-                .orElseThrow(() -> new EntityNotFoundException(TRANSACTION_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException(AppConstants.TRANSACTION_NOT_FOUND));
     }
 
     @Transactional(readOnly = true)
     public List<TransactionDTO> getTransactionsByCustomerId(Integer customerId) {
         if (!customerRepository.existsById(customerId)) {
-            throw new EntityNotFoundException(CUSTOMER_NOT_FOUND);
+            throw new EntityNotFoundException(AppConstants.CUSTOMER_NOT_FOUND);
         }
         return transactionRepository.findByCustomerId(customerId).stream()
                 .map(transactionMapper::toDTO)
@@ -123,7 +122,7 @@ public class TransactionService {
     @Transactional
     public TransactionDTO update(Integer id, TransactionDTO dto) {
         Transaction existing = transactionRepository.findByIdWithDetails(id)
-                .orElseThrow(() -> new EntityNotFoundException(TRANSACTION_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException(AppConstants.TRANSACTION_NOT_FOUND));
 
         String oldType = existing.getType();
         String newType = dto.getType() != null ? dto.getType() : oldType;
@@ -139,7 +138,7 @@ public class TransactionService {
 
         if (dto.getCustomerId() != null) {
             Customer customer = customerRepository.findById(dto.getCustomerId())
-                    .orElseThrow(() -> new EntityNotFoundException(CUSTOMER_NOT_FOUND));
+                    .orElseThrow(() -> new EntityNotFoundException(AppConstants.CUSTOMER_NOT_FOUND));
             existing.setCustomer(customer);
         }
 
@@ -156,7 +155,7 @@ public class TransactionService {
 
             for (TransactionItemDTO itemDto : dto.getItems()) {
                 Product product = productRepository.findById(itemDto.getProductId())
-                        .orElseThrow(() -> new EntityNotFoundException(PRODUCT_NOT_FOUND));
+                        .orElseThrow(() -> new EntityNotFoundException(AppConstants.PRODUCT_NOT_FOUND));
 
                 updateStock(product, itemDto.getQuantity(), newType, false);
 
@@ -202,7 +201,7 @@ public class TransactionService {
     @Transactional
     public void delete(Integer id) {
         Transaction transaction = transactionRepository.findByIdWithDetails(id)
-                .orElseThrow(() -> new EntityNotFoundException(TRANSACTION_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException(AppConstants.TRANSACTION_NOT_FOUND));
 
         if (transaction.getItems() != null) {
             for (TransactionItem item : transaction.getItems()) {
@@ -220,10 +219,10 @@ public class TransactionService {
         int currentStock = product.getStock();
         int newStock;
 
-        boolean isSale = SALE.equalsIgnoreCase(type);
-        boolean isReturn = RETURN.equalsIgnoreCase(type);
-        boolean isExchange = EXCHANGE.equalsIgnoreCase(type);
-        boolean isRefund = REFUND.equalsIgnoreCase(type);
+        boolean isSale = AppConstants.SALE.equalsIgnoreCase(type);
+        boolean isReturn = AppConstants.RETURN.equalsIgnoreCase(type);
+        boolean isExchange = AppConstants.EXCHANGE.equalsIgnoreCase(type);
+        boolean isRefund = AppConstants.REFUND.equalsIgnoreCase(type);
 
         if (isExchange || isRefund) {
             return;
@@ -241,7 +240,7 @@ public class TransactionService {
             if (isSale) {
                 newStock = currentStock - quantity;
                 if (newStock < 0) {
-                    throw new IllegalStateException(NOT_ENOUGH_STOCK + product.getName());
+                    throw new IllegalStateException(AppConstants.NOT_ENOUGH_STOCK + product.getName());
                 }
             } else if (isReturn) {
                 newStock = currentStock + quantity;

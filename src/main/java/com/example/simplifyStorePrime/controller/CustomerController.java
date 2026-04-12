@@ -1,5 +1,6 @@
 package com.example.simplifyStorePrime.controller;
 
+import com.example.simplifyStorePrime.commons.AppConstants;
 import com.example.simplifyStorePrime.dto.CustomerDTO;
 import com.example.simplifyStorePrime.service.CustomerService;
 import jakarta.validation.Valid;
@@ -21,33 +22,33 @@ public class CustomerController {
 
     @GetMapping("/{id}")
     public ResponseEntity<CustomerDTO> getCustomerById(@PathVariable Integer id) {
-        log.info("Getting customer with id: {}", id);
+        log.info(AppConstants.LOG_GETTING_CUSTOMER, id);
         return ResponseEntity.ok(customerService.getCustomerById(id));
     }
 
     @PostMapping
     public ResponseEntity<CustomerDTO> createCustomer(@Valid @RequestBody CustomerDTO dto) {
         CustomerDTO created = customerService.createCustomer(dto);
-        log.info("Creating new customer: {}", created.getId());
+        log.info(AppConstants.LOG_CREATING_CUSTOMER, created.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<CustomerDTO> updateCustomer(@PathVariable Integer id,
                                                       @RequestBody CustomerDTO dto) {
-        log.info("Updated customer with id: {}", dto.getId());
+        log.info(AppConstants.LOG_UPDATING_CUSTOMER, dto.getId());
         return ResponseEntity.ok(customerService.updateCustomer(id, dto));
     }
 
     @GetMapping
     public ResponseEntity<List<CustomerDTO>> getAllCustomers() {
-        log.info("Returned all customers from database");
+        log.info(AppConstants.LOG_RETURNED_ALL_CUSTOMERS);
         return ResponseEntity.ok(customerService.getAllCustomers());
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCustomer(@PathVariable Integer id) {
-        log.info("Deleting customer with id: {}", id);
+        log.info(AppConstants.LOG_DELETING_CUSTOMER, id);
         customerService.deleteCustomer(id);
         return ResponseEntity.noContent().build();
     }

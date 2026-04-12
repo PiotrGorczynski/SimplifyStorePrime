@@ -1,5 +1,6 @@
 package com.example.simplifyStorePrime.config;
 
+import com.example.simplifyStorePrime.commons.AppConstants;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.Contact;
@@ -16,19 +17,19 @@ public class SwaggerConfig {
     public OpenAPI openAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("Simplify Store Prime API")
-                        .description("REST API for e-commerce customer management system — Master's thesis project")
-                        .version("1.0.0")
+                        .title(AppConstants.API_TITLE)
+                        .description(AppConstants.API_DESCRIPTION)
+                        .version(AppConstants.API_VERSION)
                         .contact(new Contact()
-                                .name("Piotr")
+                                .name(AppConstants.API_AUTHOR)
                         ))
-                .addSecurityItem(new SecurityRequirement().addList("Bearer Authentication"))
+                .addSecurityItem(new SecurityRequirement().addList(AppConstants.BEARER_AUTH))
                 .components(new Components()
-                        .addSecuritySchemes("Bearer Authentication",
+                        .addSecuritySchemes(AppConstants.BEARER_AUTH,
                                 new SecurityScheme()
                                         .type(SecurityScheme.Type.HTTP)
-                                        .scheme("bearer")
-                                        .bearerFormat("JWT")
+                                        .scheme(AppConstants.BEARER_SCHEME)
+                                        .bearerFormat(AppConstants.BEARER_FORMAT)
                         ));
     }
 }

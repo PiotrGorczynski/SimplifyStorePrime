@@ -1,5 +1,6 @@
 package com.example.simplifyStorePrime.service;
 
+import com.example.simplifyStorePrime.commons.AppConstants;
 import com.example.simplifyStorePrime.dto.RegisterRequest;
 import com.example.simplifyStorePrime.dto.AuthenticationResponse;
 import com.example.simplifyStorePrime.dto.AuthenticationRequest;
@@ -34,20 +35,18 @@ public class AuthenticationService {
     @Transactional
     public AuthenticationResponse register(RegisterRequest request) {
         if (repository.existsByUsername(request.getUsername())) {
-            throw new RuntimeException("Username already exists: " + request.getUsername());
+            throw new RuntimeException(AppConstants.USERNAME_ALREADY_EXISTS + request.getUsername());
         }
 
         AppUser user = AppUser.builder()
                 .username(request.getUsername())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(request.getRole() != null ? request.getRole() : "USER")
+                .role(request.getRole() != null ? request.getRole() : AppConstants.DEFAULT_ROLE)
                 .enabled(true)
                 .build();
 
         AppUser saved = repository.save(user);
-
-        System.out.println("=== USER SAVED: " + saved.getId() + " - " + saved.getUsername() + " ===");
 
         UserDetails userDetails = User.withUsername(saved.getUsername())
                 .password(saved.getPassword())
@@ -78,7 +77,7 @@ public class AuthenticationService {
     @Transactional
     public void forgotPassword(String email) {
         AppUser user = repository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException(AppConstants.USER_NOT_FOUND));
 
         tokenRepository.deleteByUserId(user.getId());
 
@@ -99,14 +98,14 @@ public class AuthenticationService {
     @Transactional
     public void resetPassword(String token, String newPassword) {
         PasswordResetToken resetToken = tokenRepository.findByToken(token)
-                .orElseThrow(() -> new RuntimeException("Invalid or expired reset token"));
+                .orElseThrow(() -> new RuntimeException(AppConstants.INVALID_RESET_TOKEN));
 
         if (resetToken.isExpired()) {
-            throw new RuntimeException("Reset token has expired. Please request a new one.");
+            throw new RuntimeException(AppConstants.RESET_TOKEN_EXPIRED);
         }
 
         if (resetToken.isUsed()) {
-            throw new RuntimeException("This reset token has already been used.");
+            throw new RuntimeException(AppConstants.RESET_TOKEN_USED);
         }
 
         AppUser user = resetToken.getUser();

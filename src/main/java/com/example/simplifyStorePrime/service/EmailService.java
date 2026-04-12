@@ -1,5 +1,6 @@
 package com.example.simplifyStorePrime.service;
 
+import com.example.simplifyStorePrime.commons.AppConstants;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -20,21 +21,21 @@ public class EmailService {
     public void sendPasswordResetEmail(String toEmail, String token) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, AppConstants.EMAIL_ENCODING);
 
-            helper.setFrom("noreply@simplifystore.com");
+            helper.setFrom(AppConstants.EMAIL_FROM);
             helper.setTo(toEmail);
-            helper.setSubject("Simplify Store Prime - Password Reset");
+            helper.setSubject(AppConstants.EMAIL_SUBJECT);
             helper.setText(buildResetEmailHtml(token), true);
 
             mailSender.send(message);
         } catch (MessagingException e) {
-            throw new RuntimeException("Failed to send email: " + e.getMessage());
+            throw new RuntimeException(AppConstants.EMAIL_SEND_FAILED + e.getMessage());
         }
     }
 
     private String buildResetEmailHtml(String token) {
-        String resetLink = frontendUrl + "/reset-password?token=" + token;
+        String resetLink = frontendUrl + AppConstants.RESET_PASSWORD_PATH + token;
 
         return """
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">

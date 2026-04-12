@@ -1,5 +1,6 @@
 package com.example.simplifyStorePrime.config;
 
+import com.example.simplifyStorePrime.commons.AppConstants;
 import com.example.simplifyStorePrime.repository.AppUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -27,7 +28,7 @@ public class ApplicationConfig {
                         .roles(user.getRole())
                         .build()
                 )
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new UsernameNotFoundException(AppConstants.USER_NOT_FOUND));
     }
 
     @Bean

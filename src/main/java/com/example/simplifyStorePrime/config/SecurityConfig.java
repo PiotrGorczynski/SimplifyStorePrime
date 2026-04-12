@@ -1,5 +1,6 @@
 package com.example.simplifyStorePrime.config;
 
+import com.example.simplifyStorePrime.commons.AppConstants;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,12 +32,12 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/**").authenticated()
-                        .requestMatchers(HttpMethod.POST, "/api/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/**").hasRole("ADMIN")
+                        .requestMatchers(AppConstants.AUTH_ENDPOINTS).permitAll()
+                        .requestMatchers(AppConstants.SWAGGER_UI_PATTERN, AppConstants.API_DOCS_PATTERN, AppConstants.SWAGGER_HTML).permitAll()
+                        .requestMatchers(HttpMethod.GET, AppConstants.ALL_API_PATTERN).authenticated()
+                        .requestMatchers(HttpMethod.POST, AppConstants.ALL_API_PATTERN).hasRole(AppConstants.ROLE_ADMIN)
+                        .requestMatchers(HttpMethod.PUT, AppConstants.ALL_API_PATTERN).hasRole(AppConstants.ROLE_ADMIN)
+                        .requestMatchers(HttpMethod.DELETE, AppConstants.ALL_API_PATTERN).hasRole(AppConstants.ROLE_ADMIN)
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -48,17 +49,20 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList(
-                "http://localhost:4200",
-                "https://simplifystoreprimefrontend-production.up.railway.app"
+        configuration.setAllowedOrigins(Arrays.asList(AppConstants.CORS_LOCALHOST, AppConstants.CORS_RAILWAY));
+        configuration.setAllowedMethods(Arrays.asList(
+                AppConstants.METHOD_GET,
+                AppConstants.METHOD_POST,
+                AppConstants.METHOD_PUT,
+                AppConstants.METHOD_DELETE,
+                AppConstants.METHOD_OPTIONS
         ));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
-        configuration.setExposedHeaders(List.of("Authorization"));
+        configuration.setAllowedHeaders(Arrays.asList(AppConstants.AUTHORIZATION_HEADER, AppConstants.CONTENT_TYPE_HEADER, AppConstants.X_REQUESTED_WITH_HEADER));
+        configuration.setExposedHeaders(List.of(AppConstants.AUTHORIZATION_HEADER));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
+        source.registerCorsConfiguration(AppConstants.CORS_PATTERN, configuration);
         return source;
     }
 }

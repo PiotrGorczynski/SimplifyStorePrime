@@ -3,7 +3,7 @@ package com.example.simplifyStorePrime.service;
 import com.example.simplifyStorePrime.dto.DeliveryDTO;
 import com.example.simplifyStorePrime.entity.Delivery;
 import com.example.simplifyStorePrime.entity.Transaction;
-import com.example.simplifyStorePrime.exception.ErrorMessages;
+import com.example.simplifyStorePrime.commons.AppConstants;
 import com.example.simplifyStorePrime.mapper.DeliveryMapper;
 import com.example.simplifyStorePrime.repository.DeliveryRepository;
 import com.example.simplifyStorePrime.repository.TransactionRepository;
@@ -29,15 +29,15 @@ public class DeliveryService {
     public DeliveryDTO getDeliveryById(Integer id) {
         return deliveryRepository.findById(id)
                 .map(deliveryMapper::toDTO)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorMessages.DELIVERY_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException(AppConstants.DELIVERY_NOT_FOUND));
     }
 
     public DeliveryDTO createDelivery(DeliveryDTO dto) {
         Transaction transaction = transactionRepository.findById(dto.getTransactionId())
-                .orElseThrow(() -> new EntityNotFoundException(ErrorMessages.TRANSACTION_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException(AppConstants.TRANSACTION_NOT_FOUND));
 
         if (deliveryRepository.findByTransactionId(dto.getTransactionId()).isPresent()) {
-            throw new IllegalStateException(ErrorMessages.DELIVERY_ALREADY_EXISTS);
+            throw new IllegalStateException(AppConstants.DELIVERY_ALREADY_EXISTS);
         }
 
         Delivery delivery = deliveryMapper.toEntity(dto);
@@ -49,10 +49,10 @@ public class DeliveryService {
 
     public DeliveryDTO updateDelivery(Integer id, DeliveryDTO dto) {
         Delivery existing = deliveryRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorMessages.DELIVERY_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException(AppConstants.DELIVERY_NOT_FOUND));
 
         Transaction transaction = transactionRepository.findById(dto.getTransactionId())
-                .orElseThrow(() -> new EntityNotFoundException(ErrorMessages.TRANSACTION_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException(AppConstants.TRANSACTION_NOT_FOUND));
 
         deliveryMapper.updateEntity(existing, dto, transaction);
 
@@ -62,7 +62,7 @@ public class DeliveryService {
 
     public void deleteDelivery(Integer id) {
         if (!deliveryRepository.existsById(id)) {
-            throw new EntityNotFoundException(ErrorMessages.DELIVERY_NOT_FOUND);
+            throw new EntityNotFoundException(AppConstants.DELIVERY_NOT_FOUND);
         }
         deliveryRepository.deleteById(id);
     }

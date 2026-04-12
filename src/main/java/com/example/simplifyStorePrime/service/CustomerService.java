@@ -2,7 +2,7 @@ package com.example.simplifyStorePrime.service;
 
 import com.example.simplifyStorePrime.dto.CustomerDTO;
 import com.example.simplifyStorePrime.entity.Customer;
-import com.example.simplifyStorePrime.exception.ErrorMessages;
+import com.example.simplifyStorePrime.commons.AppConstants;
 import com.example.simplifyStorePrime.mapper.CustomerMapper;
 import com.example.simplifyStorePrime.repository.CustomerRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -26,7 +26,7 @@ public class CustomerService {
     public CustomerDTO getCustomerById(Integer id) {
         return customerRepository.findById(id)
                 .map(customerMapper::toDTO)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorMessages.CUSTOMER_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException(AppConstants.CUSTOMER_NOT_FOUND));
     }
 
     public CustomerDTO createCustomer(CustomerDTO dto) {
@@ -37,7 +37,7 @@ public class CustomerService {
 
     public CustomerDTO updateCustomer(Integer id, CustomerDTO dto) {
         Customer existing = customerRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorMessages.CUSTOMER_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException(AppConstants.CUSTOMER_NOT_FOUND));
 
         customerMapper.updateEntity(dto, existing);
         Customer updated = customerRepository.save(existing);
@@ -47,7 +47,7 @@ public class CustomerService {
 
     public void deleteCustomer(Integer id) {
         if (!customerRepository.existsById(id)) {
-            throw new EntityNotFoundException(ErrorMessages.CUSTOMER_NOT_FOUND);
+            throw new EntityNotFoundException(AppConstants.CUSTOMER_NOT_FOUND);
         }
         customerRepository.deleteById(id);
     }

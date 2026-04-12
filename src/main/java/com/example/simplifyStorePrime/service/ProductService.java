@@ -2,7 +2,7 @@ package com.example.simplifyStorePrime.service;
 
 import com.example.simplifyStorePrime.dto.ProductDTO;
 import com.example.simplifyStorePrime.entity.Product;
-import com.example.simplifyStorePrime.exception.ErrorMessages;
+import com.example.simplifyStorePrime.commons.AppConstants;
 import com.example.simplifyStorePrime.mapper.ProductMapper;
 import com.example.simplifyStorePrime.repository.ProductRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -26,7 +26,7 @@ public class ProductService {
     public ProductDTO getProductById(Integer id) {
         return productRepository.findById(id)
                 .map(productMapper::toDTO)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorMessages.PRODUCT_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException(AppConstants.PRODUCT_NOT_FOUND));
     }
 
     public ProductDTO createProduct(ProductDTO dto) {
@@ -37,7 +37,7 @@ public class ProductService {
 
     public ProductDTO updateProduct(Integer id, ProductDTO dto) {
         Product existing = productRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorMessages.PRODUCT_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException(AppConstants.PRODUCT_NOT_FOUND));
 
         productMapper.updateEntity(dto, existing);
         Product updated = productRepository.save(existing);
@@ -47,7 +47,7 @@ public class ProductService {
 
     public void deleteProduct(Integer id) {
         if (!productRepository.existsById(id)) {
-            throw new EntityNotFoundException(ErrorMessages.PRODUCT_NOT_FOUND);
+            throw new EntityNotFoundException(AppConstants.PRODUCT_NOT_FOUND);
         }
         productRepository.deleteById(id);
     }
