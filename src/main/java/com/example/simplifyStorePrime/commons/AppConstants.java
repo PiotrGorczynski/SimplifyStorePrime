@@ -83,7 +83,7 @@ public final class AppConstants {
 
     // ==================== CORS ====================
     public static final String CORS_LOCALHOST = "http://localhost:4200";
-    public static final String CORS_RAILWAY = "https://simplifystoreprimefrontend-production.up.railway.app";
+    public static final String CORS_RAILWAY = "https://simplifystoreprimefrontend-production-9203.up.railway.app";
     public static final String CONTENT_TYPE_HEADER = "Content-Type";
     public static final String X_REQUESTED_WITH_HEADER = "X-Requested-With";
 
